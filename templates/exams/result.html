@@ -1,0 +1,14 @@
+﻿{% extends 'base.html' %}
+{% block title %}Exam Result{% endblock %}
+{% block content %}
+<h2>Final Exam Result - {{ exam.course.title }}</h2>
+<p>You scored {{ correct }} out of {{ total }} ({{ score|floatformat:1 }}%)</p>
+{% if passed %}
+    <div class="alert alert-success">Congratulations! You passed the final exam.</div>
+    <a href="{% url 'download_certificate' result.id %}" class="btn btn-warning">
+        <i class="bi bi-award-fill"></i> Download Certificate
+    </a>
+{% else %}
+    <div class="alert alert-danger">You did not pass. You may retake the exam.</div>
+{% endif %}
+{% endblock %}

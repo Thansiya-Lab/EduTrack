@@ -1,0 +1,127 @@
+﻿{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}EduTrack{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@1&family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="{% static 'images/edutrack_logo_icon.png' %}">
+    <style>
+        :root {
+            --brand: #7E3F8F;
+            --brand-dark: #5C2E6B;
+            --brand-light: #9B6BAE;
+            --brand-subtle: #D8D8F6;
+            --accent: #F59E0B;
+        }
+        body { background-color: #f8f9fa; font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Manrope', sans-serif; font-weight: 700; }
+        .logo-text { font-family: 'DM Serif Display', serif; font-style: italic; font-size: 2rem; color: var(--brand-dark); margin-left: 0.5rem; }
+
+        .btn-primary { --bs-btn-bg: var(--brand); --bs-btn-border-color: var(--brand); --bs-btn-hover-bg: var(--brand-dark); --bs-btn-hover-border-color: var(--brand-dark); --bs-btn-active-bg: var(--brand-dark); --bs-btn-active-border-color: var(--brand-dark); }
+        .btn-outline-primary { --bs-btn-color: var(--brand); --bs-btn-border-color: var(--brand); --bs-btn-hover-bg: var(--brand); --bs-btn-hover-border-color: var(--brand); }
+        .text-primary, .text-brand { color: var(--brand) !important; }
+        .bg-primary { background-color: var(--brand) !important; }
+        .bg-primary-subtle { background-color: var(--brand-subtle) !important; }
+
+        .navbar { padding-top: 1.1rem; padding-bottom: 1.1rem; }
+        .navbar-brand { display: flex; align-items: center; }
+        .navbar-brand img { height: 60px; }
+        .navbar-light .nav-link { color: #333 !important; font-weight: 500; font-family: 'Manrope', sans-serif; }
+        .navbar-light .nav-link:hover { color: var(--brand) !important; }
+
+        .course-card { transition: transform 0.2s ease, box-shadow 0.2s ease; border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .course-card:hover { transform: translateY(-6px); box-shadow: 0 10px 20px rgba(0,0,0,0.12); }
+
+        .hero-section { background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%); color: white; border-radius: 1rem; }
+        .hero-section .btn-light { font-weight: 600; }
+        .hero-tagline { font-family: 'DM Serif Display', serif; font-style: italic; font-size: 1.35rem; color: var(--brand-subtle); }
+        .hero-step-icon { width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center; font-size: 22px; color: #fff; margin-right: 1rem; flex-shrink: 0; }
+        .hero-step-text { color: #EDE7FB; font-size: 0.95rem; font-family: 'Inter', sans-serif; }
+
+        .stats-bar { background: #ffffff; border-radius: 1rem; padding: 2.5rem 1rem; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+        .stats-number { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 2.75rem; color: var(--brand); line-height: 1; }
+        .stats-label { color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.82rem; margin-top: 0.5rem; }
+        @media (min-width: 768px) {
+            .stats-divider { border-left: 2px solid var(--brand-subtle); }
+        }
+
+        .category-heading { border-left: 5px solid var(--brand); padding-left: 12px; margin-top: 2rem; }
+        .section-title { font-weight: 700; color: #1E2761; }
+        .section-divider { width: 60px; height: 3px; background: var(--accent); margin: 0.5rem auto 1.5rem; border: none; }
+
+        .service-icon, .audience-icon { width: 72px; height: 72px; border-radius: 50%; background: var(--brand-subtle); display: flex; align-items: center; justify-content: center; font-size: 30px; color: var(--brand); margin: 0 auto 1rem; }
+        .audience-card { border: 1px solid #e9ecef; border-radius: 12px; padding: 2rem 1.5rem; text-align: center; height: 100%; transition: box-shadow 0.2s ease, transform 0.2s ease; }
+        .audience-card:hover { box-shadow: 0 10px 20px rgba(0,0,0,0.08); transform: translateY(-4px); }
+        .service-desc { max-width: 320px; margin: 0 auto; }
+
+        .about-split { border-radius: 1rem; overflow: hidden; }
+        .about-panel { background: linear-gradient(135deg, var(--brand-dark) 0%, var(--brand) 100%); color: white; padding: 3rem 2rem; display: flex; align-items: center; justify-content: center; min-height: 260px; }
+        .about-panel h2 { font-size: 2.2rem; font-weight: 800; margin: 0; }
+
+        footer { background-color: var(--brand-dark); color: #EDE7FB; margin-top: 4rem; padding: 2rem 0; }
+        footer a { color: #fff; text-decoration: none; font-weight: 600; }
+        footer .logo-text { color: #fff; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'home' %}">
+            <img src="{% static 'images/edutrack_logo_icon.png' %}" alt="EduTrack">
+            <span class="logo-text">EduTrack</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navMenu">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}#about">About</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}#contact">Contact</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}#services">Services</a></li>
+                {% if user.is_authenticated %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'progress' %}">Progress</a></li>
+                    <li class="nav-item"><span class="nav-link">Hello, {{ user.username }}</span></li>
+                    <li class="nav-item">
+                        <form method="post" action="{% url 'logout' %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-link nav-link" style="border:none;">Logout</button>
+                        </form>
+                    </li>
+                {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Register</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-info">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    {% block content %}
+    {% endblock %}
+</div>
+
+<footer id="footer-contact">
+    <div class="container text-center">
+        <div class="d-flex justify-content-center align-items-center mb-2">
+            <span class="logo-text">EduTrack</span>
+        </div>
+        <p class="mb-1">Smart Course Management and Assessment System</p>
+        <p class="mb-1"><i class="bi bi-envelope-fill"></i> Contact us for any query: <a href="mailto:admin.edutrack@gmail.com">admin.edutrack@gmail.com</a></p>
+        <p class="mb-0 mt-2" style="font-size: 0.85rem;">&copy; 2026 EduTrack. All rights reserved.</p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

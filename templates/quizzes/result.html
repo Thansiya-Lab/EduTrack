@@ -1,0 +1,16 @@
+﻿{% extends 'base.html' %}
+{% block title %}Quiz Result{% endblock %}
+{% block content %}
+<h2>Quiz Result - {{ quiz.title }}</h2>
+<p>You scored {{ correct }} out of {{ total }} ({{ score|floatformat:1 }}%)</p>
+{% if score >= quiz.pass_percentage %}
+    <div class="alert alert-success">Congratulations! You passed.</div>
+{% else %}
+    <div class="alert alert-danger">You did not pass. Try again!</div>
+{% endif %}
+
+<a href="{% url 'course_detail' quiz.module.course.slug %}" class="btn btn-primary">
+    <i class="bi bi-arrow-left-circle"></i> Back to Course
+    {% if score >= quiz.pass_percentage %}(Next Module Unlocked){% endif %}
+</a>
+{% endblock %}

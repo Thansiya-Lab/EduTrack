@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}{{ exam.course.title }} - Final Exam{% endblock %}
+{% block content %}
+<h2>Final Exam - {{ exam.course.title }}</h2>
+<p>Duration: {{ exam.duration_minutes }} minutes | Pass mark: {{ exam.pass_percentage }}%</p>
+<div id="timer" class="alert alert-warning">Time remaining: <span id="time-left"></span></div>
+
+<form method="post" id="exam-form">
+    {% csrf_token %}
+    {% for question in exam.questions.all %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5>{{ forloop.counter }}. {{ question.text }}</h5>
+                {% for choice in question.choices.all %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="question_{{ question.id }}" value="{{ choice.id }}" id="choice_{{ choice.id }}">
+                        <label class="form-check-label" for="choice_{{ choice.id }}">{{ choice.text }}</label>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">Submit Exam</button>
+</form>
+
+<script>
+    let duration = {{ exam.duration_minutes }} * 60;
+    const timeLeftSpan = document.getElementById('time-left');
+    const examForm = document.getElementById('exam-form');
+
+    function updateTimer() {
+        let minutes = Math.floor(duration / 60);
+        let seconds = duration % 60;
+        timeLeftSpan.textContent = minutes + 'm ' + seconds + 's';
+        if (duration <= 0) {
+            examForm.submit();
+        } else {
+            duration--;
+            setTimeout(updateTimer, 1000);
+        }
+    }
+    updateTimer();
+</script>
+{% endblock %}

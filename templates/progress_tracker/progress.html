@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}My Progress{% endblock %}
+{% block content %}
+<h2>My Progress</h2>
+
+{% for item in data %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h4>{{ item.course.title }}</h4>
+            <p>Total Modules: {{ item.total_modules }}</p>
+
+            <h6>Quiz Attempts</h6>
+            {% if item.quiz_attempts %}
+                <ul>
+                    {% for attempt in item.quiz_attempts %}
+                        <li>{{ attempt.quiz.title }} - {{ attempt.score_percent|floatformat:1 }}%</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">No quizzes attempted yet.</p>
+            {% endif %}
+
+            <h6>Final Exam</h6>
+            {% if item.exam_result %}
+                <p>
+                    Score: {{ item.exam_result.score_percent|floatformat:1 }}%
+                    {% if item.exam_result.passed %}
+                        <span class="badge bg-success">Passed</span>
+                    {% else %}
+                        <span class="badge bg-danger">Not Passed</span>
+                    {% endif %}
+                </p>
+            {% else %}
+                <p class="text-muted">Final exam not attempted yet.</p>
+            {% endif %}
+        </div>
+    </div>
+{% empty %}
+    <p>You are not enrolled in any courses yet.</p>
+{% endfor %}
+{% endblock %}
