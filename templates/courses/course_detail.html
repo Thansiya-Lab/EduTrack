@@ -8,130 +8,163 @@
 
 {% if user.is_authenticated %}
     {% if is_enrolled %}
-        <span class="badge bg-success">You are enrolled</span>
+        <span class="badge bg-success mb-3">You are enrolled</span>
     {% else %}
-        <form method="post" action="{% url 'enroll' course.slug %}">
+        <form method="post" action="{% url 'enroll' course.slug %}" class="mb-3">
             {% csrf_token %}
             <button type="submit" class="btn btn-success">Enroll in this Course</button>
         </form>
     {% endif %}
 {% else %}
-    <a href="{% url 'login' %}" class="btn btn-warning">Login to Enroll</a>
+    <a href="{% url 'login' %}" class="btn btn-warning mb-3">Login to Enroll</a>
 {% endif %}
 
-<h4 class="mt-4">Modules</h4>
-<div class="mb-4">
-    {% if not user.is_authenticated %}
-        <div class="alert alert-secondary">
-            <i class="bi bi-lock-fill"></i> Please <a href="{% url 'login' %}">login</a> and enroll to access module content, videos, study material and quizzes.
-        </div>
-        {% for module in course.modules.all %}
-            <div class="card mb-3 bg-light">
-                <div class="card-body">
-                    <h5 class="mb-0 text-muted"><i class="bi bi-lock-fill"></i> {{ module.title }}</h5>
-                </div>
-            </div>
-        {% endfor %}
+<h4 class="mt-4 mb-3">Modules</h4>
 
-    {% elif not is_enrolled %}
-        <div class="alert alert-secondary">
-            <i class="bi bi-lock-fill"></i> Enroll in this course to unlock module content, videos, study material and quizzes.
-        </div>
-        {% for module in course.modules.all %}
-            <div class="card mb-3 bg-light">
-                <div class="card-body">
-                    <h5 class="mb-0 text-muted"><i class="bi bi-lock-fill"></i> {{ module.title }}</h5>
-                </div>
+{% if not user.is_authenticated %}
+    <div class="alert alert-secondary">
+        <i class="bi bi-lock-fill"></i> Please <a href="{% url 'login' %}">login</a> and enroll to access module content, videos, study material and quizzes.
+    </div>
+    {% for module in course.modules.all %}
+        <div class="card mb-2 bg-light">
+            <div class="card-body py-2">
+                <span class="text-muted"><i class="bi bi-lock-fill"></i> Week {{ forloop.counter }}: {{ module.title }}</span>
             </div>
-        {% endfor %}
+        </div>
+    {% endfor %}
 
-    {% else %}
-        {% for item in module_data %}
-            <div class="card mb-3 {% if not item.unlocked %}bg-light{% endif %}">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h5 class="mb-0 {% if not item.unlocked %}text-muted{% endif %}">
-                            {% if not item.unlocked %}<i class="bi bi-lock-fill"></i>{% endif %}
-                            {{ item.module.title }}
-                        </h5>
-                        {% if item.module.quiz %}
-                            {% if item.quiz_accessible %}
-                                <a href="{% url 'take_quiz' item.module.quiz.id %}" class="btn btn-sm btn-outline-primary">Take Quiz</a>
+{% elif not is_enrolled %}
+    <div class="alert alert-secondary">
+        <i class="bi bi-lock-fill"></i> Enroll in this course to unlock module content, videos, study material and quizzes.
+    </div>
+    {% for module in course.modules.all %}
+        <div class="card mb-2 bg-light">
+            <div class="card-body py-2">
+                <span class="text-muted"><i class="bi bi-lock-fill"></i> Week {{ forloop.counter }}: {{ module.title }}</span>
+            </div>
+        </div>
+    {% endfor %}
+
+{% else %}
+<div class="row">
+    <!-- LEFT: Week menu -->
+    <div class="col-md-3 mb-4">
+        <div class="list-group sticky-top" style="top: 1.25rem;">
+            {% for item in module_data %}
+                <a href="#"
+                   class="list-group-item list-group-item-action week-nav-item {% if forloop.first %}active{% endif %} {% if not item.unlocked %}disabled{% endif %}"
+                   data-week="week-{{ item.module.id }}"
+                   {% if not item.unlocked %}tabindex="-1" aria-disabled="true"{% endif %}>
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <strong>Week {{ forloop.counter }}</strong><br>
+                            <small>{{ item.module.title }}</small>
+                        </div>
+                        <span>
+                            {% if not item.unlocked %}
+                                <i class="bi bi-lock-fill"></i>
+                            {% elif item.video_watched or not item.module.has_video %}
+                                <i class="bi bi-check-circle-fill text-success"></i>
                             {% else %}
-                                <button class="btn btn-sm btn-outline-secondary" disabled>
-                                    <i class="bi bi-lock-fill"></i> Take Quiz
-                                </button>
+                                <i class="bi bi-play-circle"></i>
                             {% endif %}
+                        </span>
+                    </div>
+                </a>
+            {% empty %}
+                <p class="text-muted">No modules added yet.</p>
+            {% endfor %}
+
+            {% if course.final_exam %}
+                {% if all_cleared %}
+                    <a href="{% url 'take_exam' course.final_exam.id %}" class="list-group-item list-group-item-action list-group-item-danger">
+                        <i class="bi bi-mortarboard-fill me-1"></i> <strong>Final Exam</strong>
+                    </a>
+                {% else %}
+                    <div class="list-group-item text-muted">
+                        <i class="bi bi-lock-fill me-1"></i> <strong>Final Exam</strong>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- RIGHT: Selected week's content -->
+    <div class="col-md-9">
+        {% for item in module_data %}
+            <div class="week-content" id="week-{{ item.module.id }}" style="{% if not forloop.first %}display:none;{% endif %}">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="mb-0">Week {{ forloop.counter }}: {{ item.module.title }}</h5>
+                            {% if item.module.quiz %}
+                                {% if item.quiz_accessible %}
+                                    <a href="{% url 'take_quiz' item.module.quiz.id %}" class="btn btn-sm btn-outline-primary">Take Quiz</a>
+                                {% else %}
+                                    <button class="btn btn-sm btn-outline-secondary" disabled>
+                                        <i class="bi bi-lock-fill"></i> Take Quiz
+                                    </button>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+
+                        {% if item.unlocked %}
+                            {% if item.module.content %}
+                                <p class="text-secondary">{{ item.module.content }}</p>
+                            {% endif %}
+
+                            {% if item.module.video_file %}
+                                <video
+                                    id="video-{{ item.module.id }}"
+                                    class="w-100 mb-2 rounded"
+                                    style="max-height: 420px; background:#000;"
+                                    controls
+                                    data-module-id="{{ item.module.id }}">
+                                    <source src="{{ item.module.video_file.url }}">
+                                    Your browser does not support the video tag.
+                                </video>
+
+                                {% if item.video_watched %}
+                                    <p class="small text-success mb-2"><i class="bi bi-check-circle-fill"></i> Video completed - quiz unlocked</p>
+                                {% else %}
+                                    <p class="small text-muted mb-2"><i class="bi bi-info-circle"></i> Watch the full video to unlock this module's quiz</p>
+                                {% endif %}
+
+                            {% elif item.youtube_embed_url %}
+                                <div class="ratio ratio-16x9 mb-2" style="max-width: 640px;">
+                                    <iframe
+                                        src="{{ item.youtube_embed_url }}"
+                                        allow="autoplay; encrypted-media"
+                                        allowfullscreen>
+                                    </iframe>
+                                </div>
+
+                                {% if item.video_watched %}
+                                    <p class="small text-success mb-2"><i class="bi bi-check-circle-fill"></i> Video marked as watched - quiz unlocked</p>
+                                {% else %}
+                                    <div class="alert alert-light border py-2 px-3 mb-2">
+                                        <p class="small text-muted mb-2"><i class="bi bi-info-circle"></i> Some YouTube videos cannot report "video finished" automatically when embedded. Watch the full video above, then confirm below to unlock the quiz.</p>
+                                        <button type="button" class="btn btn-sm btn-success js-mark-watched" data-module-id="{{ item.module.id }}">
+                                            <i class="bi bi-check-circle"></i> I've watched the full video
+                                        </button>
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+
+                            {% if item.module.material_pdf %}
+                                <a href="{{ item.module.material_pdf.url }}" target="_blank" class="btn btn-sm btn-outline-dark">
+                                    <i class="bi bi-file-earmark-pdf-fill"></i> View Study Material (PDF)
+                                </a>
+                            {% endif %}
+                        {% else %}
+                            <p class="text-muted mb-0"><i class="bi bi-info-circle"></i> Pass the previous week's quiz to unlock this module.</p>
                         {% endif %}
                     </div>
-
-                    {% if item.unlocked %}
-                        {% if item.module.content %}
-                            <p class="text-secondary">{{ item.module.content }}</p>
-                        {% endif %}
-
-                        {% if item.module.video_file %}
-                            <video
-                                id="video-{{ item.module.id }}"
-                                class="w-100 mb-2 rounded"
-                                style="max-height: 420px; background:#000;"
-                                controls
-                                data-module-id="{{ item.module.id }}">
-                                <source src="{{ item.module.video_file.url }}">
-                                Your browser does not support the video tag.
-                            </video>
-
-                            {% if item.video_watched %}
-                                <p class="small text-success mb-2"><i class="bi bi-check-circle-fill"></i> Video completed - quiz unlocked</p>
-                            {% else %}
-                                <p class="small text-muted mb-2"><i class="bi bi-info-circle"></i> Watch the full video to unlock this module's quiz</p>
-                            {% endif %}
-
-                        {% elif item.youtube_embed_url %}
-                            <div class="ratio ratio-16x9 mb-2" style="max-width: 640px;">
-                                <iframe
-                                    src="{{ item.youtube_embed_url }}"
-                                    allow="autoplay; encrypted-media"
-                                    allowfullscreen>
-                                </iframe>
-                            </div>
-
-                            {% if item.video_watched %}
-                                <p class="small text-success mb-2"><i class="bi bi-check-circle-fill"></i> Video marked as watched - quiz unlocked</p>
-                            {% else %}
-                                <div class="alert alert-light border py-2 px-3 mb-2">
-                                    <p class="small text-muted mb-2"><i class="bi bi-info-circle"></i> Some YouTube videos cannot report "video finished" automatically when embedded. Watch the full video above, then confirm below to unlock the quiz.</p>
-                                    <button type="button" class="btn btn-sm btn-success js-mark-watched" data-module-id="{{ item.module.id }}">
-                                        <i class="bi bi-check-circle"></i> I've watched the full video
-                                    </button>
-                                </div>
-                            {% endif %}
-                        {% endif %}
-
-                        {% if item.module.material_pdf %}
-                            <a href="{{ item.module.material_pdf.url }}" target="_blank" class="btn btn-sm btn-outline-dark">
-                                <i class="bi bi-file-earmark-pdf-fill"></i> View Study Material (PDF)
-                            </a>
-                        {% endif %}
-                    {% else %}
-                        <p class="text-muted small mb-0"><i class="bi bi-info-circle"></i> Pass the previous module's quiz to unlock this module.</p>
-                    {% endif %}
                 </div>
             </div>
-        {% empty %}
-            <p>No modules added yet.</p>
         {% endfor %}
-    {% endif %}
+    </div>
 </div>
-
-{% if is_enrolled and course.final_exam %}
-    {% if all_cleared %}
-        <a href="{% url 'take_exam' course.final_exam.id %}" class="btn btn-danger">Take Final Exam</a>
-    {% else %}
-        <button class="btn btn-secondary" disabled>
-            <i class="bi bi-lock-fill"></i> Complete all module quizzes to unlock the Final Exam
-        </button>
-    {% endif %}
 {% endif %}
 
 {% if is_enrolled %}
@@ -161,6 +194,24 @@ document.querySelectorAll("video[data-module-id]").forEach(function (vid) {
 document.querySelectorAll(".js-mark-watched").forEach(function (btn) {
     btn.addEventListener("click", function () {
         markWatched(btn.getAttribute("data-module-id"));
+    });
+});
+
+// Week menu switching (NPTEL-style)
+document.querySelectorAll(".week-nav-item").forEach(function (link) {
+    link.addEventListener("click", function (e) {
+        e.preventDefault();
+        if (link.classList.contains("disabled")) { return; }
+
+        document.querySelectorAll(".week-nav-item").forEach(function (l) {
+            l.classList.remove("active");
+        });
+        link.classList.add("active");
+
+        var target = link.getAttribute("data-week");
+        document.querySelectorAll(".week-content").forEach(function (panel) {
+            panel.style.display = (panel.id === target) ? "block" : "none";
+        });
     });
 });
 </script>
