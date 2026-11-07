@@ -1,0 +1,108 @@
+.home { max-width: 1320px; margin: 0 auto; padding: 1.5rem 1rem 0; }
+
+/* hero */
+.hero { display: grid; grid-template-columns: 1.05fr 1fr; align-items: center; gap: 2rem; padding: 2rem 1rem 0; }
+.hero h1 { margin: 0; line-height: 1; color: var(--p-900); }
+.hero .welcome { display: block; font-size: clamp(2.2rem, 4.5vw, 3.6rem); font-weight: 800; }
+.hero .title { display: block; font-size: clamp(3.6rem, 8.5vw, 6.8rem); font-weight: 800; color: var(--p-700); letter-spacing: -.04em; }
+.hero .tagline { font-style: italic; font-size: 1.6rem; font-weight: 500; color: var(--ink); margin: .8rem 0 1.2rem; display: inline-block; position: relative; }
+.hero .tagline::after { content: ""; position: absolute; left: 0; bottom: -6px; width: 72px; height: 4px; border-radius: 4px; background: var(--p-700); }
+.hero p.lead { font-size: 1.12rem; color: var(--ink); max-width: 36rem; margin: 1.2rem 0 1.6rem; }
+.hero-art { width: 100%; max-width: 620px; justify-self: end; filter: drop-shadow(0 20px 30px rgba(62, 29, 74, .22)); }
+.hero-art .float { animation: bob 5s ease-in-out infinite; transform-origin: center; }
+@keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+/* journey road with pins */
+.journey { position: relative; height: 330px; margin: 1rem 0 .5rem; }
+.road { position: absolute; left: 0; right: 0; bottom: 20px; width: 100%; height: 190px; }
+.stop { position: absolute; width: 190px; transform: translateX(-50%); text-align: center; }
+.pin {
+    position: relative; width: 62px; height: 62px; margin: 0 auto -16px; z-index: 2;
+    background: linear-gradient(135deg, var(--p-500), var(--p-800));
+    border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
+    display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 18px rgba(62, 29, 74, .35);
+}
+.pin::after { content: ""; position: absolute; inset: 9px; background: #fff; border-radius: 50%; }
+.pin i { position: relative; z-index: 1; transform: rotate(45deg); font-size: 1.5rem; color: var(--p-700); }
+.stop-card {
+    background: rgba(255, 255, 255, .95); border-radius: 18px; padding: 1.4rem .9rem .9rem;
+    box-shadow: var(--shadow); transition: transform .2s;
+}
+.stop:hover .stop-card { transform: translateY(-4px); }
+.stop-card h5 { font-size: 1rem; margin: 0 0 .2rem; color: var(--ink); }
+.stop-card p { font-size: .85rem; color: var(--ink-2); margin: 0; line-height: 1.35; }
+.s1 { left: 13%; top: 70px; } .s2 { left: 31%; top: 90px; } .s3 { left: 49%; top: 20px; }
+.s4 { left: 67%; top: 90px; } .s5 { left: 85%; top: 45px; }
+
+/* stats pill */
+.stats-pill {
+    max-width: 1100px; margin: 0 auto 1.6rem; background: #fff; border-radius: 999px; box-shadow: var(--shadow);
+    display: grid; grid-template-columns: repeat(3, 1fr); padding: 1.1rem 1.5rem;
+}
+.stat { display: flex; align-items: center; justify-content: center; gap: 1rem; }
+.stat + .stat { border-left: 1.5px solid var(--p-200); }
+.stat i { font-size: 2.3rem; color: var(--p-800); }
+.stat b { display: block; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.7rem; font-weight: 800; line-height: 1; color: var(--ink); }
+.stat span { font-size: .95rem; color: var(--ink-2); }
+
+/* portal cards */
+.portals { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 1.6rem; }
+.portal {
+    display: flex; align-items: center; gap: 1.1rem; background: #fff; border-radius: 999px; padding: .8rem 1.1rem;
+    box-shadow: var(--shadow); text-decoration: none; color: var(--ink); transition: transform .2s, box-shadow .2s;
+}
+.portal:hover { transform: translateY(-3px); box-shadow: 0 16px 34px rgba(62, 29, 74, .22); color: var(--ink); }
+.portal .avatar {
+    width: 64px; height: 64px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--p-100), var(--p-200)); color: var(--p-700); font-size: 2rem;
+}
+.portal h4 { margin: 0; font-size: 1.3rem; }
+.portal p { margin: 0; color: var(--ink-2); font-size: .95rem; }
+.portal .go {
+    margin-left: auto; width: 46px; height: 46px; border-radius: 50%; background: var(--p-700); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;
+}
+
+/* lower sections */
+.section { padding: 4rem 1rem 0; max-width: 1200px; margin: 0 auto; }
+.section-title { text-align: center; font-size: clamp(1.7rem, 3vw, 2.2rem); margin-bottom: .4rem; }
+.section-sub { text-align: center; color: var(--ink-2); margin-bottom: 2rem; }
+.about-box { background: #fff; border-radius: 24px; box-shadow: var(--shadow); padding: 2.2rem; }
+.category-heading { font-size: 1.25rem; margin: 2rem 0 1rem; color: var(--p-800); }
+.course-card { height: 100%; transition: transform .2s, box-shadow .2s; }
+.course-card:hover { transform: translateY(-6px); box-shadow: 0 18px 38px rgba(62, 29, 74, .22); }
+.course-card .badge { background: var(--p-100); color: var(--p-800); font-weight: 700; border-radius: 999px; padding: .4rem .8rem; }
+.course-meta { color: #7A7090; font-size: .85rem; margin-bottom: 1rem; }
+.course-meta i { color: var(--p-500); }
+.contact-box { background: rgba(255, 255, 255, .7); border: 2px dashed var(--p-300); border-radius: 24px; padding: 2.6rem 1.5rem; text-align: center; }
+
+/* responsive */
+@media (max-width: 991.98px) {
+    .hero { grid-template-columns: 1fr; text-align: left; padding-top: 1rem; }
+    .hero-art { justify-self: center; max-width: 440px; }
+    .journey { height: auto; display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem 1rem; padding-top: 1rem; }
+    .road { display: none; }
+    .stop { position: static; width: auto; transform: none; }
+    .stats-pill { border-radius: 28px; grid-template-columns: 1fr; gap: 1rem; }
+    .stat + .stat { border-left: 0; border-top: 1.5px solid var(--p-200); padding-top: 1rem; }
+    .portals { grid-template-columns: 1fr; }
+}
+@media (max-width: 575.98px) { .journey { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .hero-art .float { animation: none; } * { transition: none !important; } }
+
+/* font polish */
+.hero .welcome { font-weight: 400; letter-spacing: 0; }
+.hero .title { font-weight: 400; letter-spacing: -.01em; }
+.hero .tagline { font-family: 'DM Serif Display', Georgia, serif; font-style: italic; font-weight: 400; font-size: 1.9rem; }
+.hero p.lead { font-size: 1.1rem; line-height: 1.7; }
+.stop-card h5, .portal h4, .course-card .card-title { font-weight: 400; font-size: 1.15rem; }
+.section-title { font-weight: 400; }
+.category-heading { font-weight: 400; font-size: 1.5rem; }
+
+/* contact icon */
+.contact-icon {
+    width: 84px; height: 84px; margin: 0 auto 1.1rem; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--p-600), var(--p-800)); color: #fff; font-size: 2.2rem;
+    box-shadow: 0 12px 26px rgba(126, 63, 143, .35), 0 0 0 10px rgba(126, 63, 143, .10);
+}

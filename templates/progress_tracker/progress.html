@@ -1,41 +1,102 @@
 {% extends 'base.html' %}
-{% block title %}My Progress{% endblock %}
+{% load static %}
+{% block title %}My Progress - EduTrack{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/progress.css' %}">{% endblock %}
 {% block content %}
-<h2>My Progress</h2>
+<div class="dash">
 
-{% for item in data %}
-    <div class="card mb-3">
-        <div class="card-body">
-            <h4>{{ item.course.title }}</h4>
-            <p>Total Modules: {{ item.total_modules }}</p>
-
-            <h6>Quiz Attempts</h6>
-            {% if item.quiz_attempts %}
-                <ul>
-                    {% for attempt in item.quiz_attempts %}
-                        <li>{{ attempt.quiz.title }} - {{ attempt.score_percent|floatformat:1 }}%</li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p class="text-muted">No quizzes attempted yet.</p>
-            {% endif %}
-
-            <h6>Final Exam</h6>
-            {% if item.exam_result %}
-                <p>
-                    Score: {{ item.exam_result.score_percent|floatformat:1 }}%
-                    {% if item.exam_result.passed %}
-                        <span class="badge bg-success">Passed</span>
-                    {% else %}
-                        <span class="badge bg-danger">Not Passed</span>
-                    {% endif %}
-                </p>
-            {% else %}
-                <p class="text-muted">Final exam not attempted yet.</p>
-            {% endif %}
+    <div class="dash-head">
+        <div>
+            <span class="dash-eyebrow">Student dashboard</span>
+            <h1>Hello, {{ user.username }}</h1>
+            <p>Here is how your learning journey is going.</p>
         </div>
+        <a href="{% url 'home' %}#courses" class="btn btn-brand"><i class="bi bi-plus-circle-fill me-2"></i>Find more courses</a>
     </div>
-{% empty %}
-    <p>You are not enrolled in any courses yet.</p>
-{% endfor %}
+
+    <!-- summary tiles -->
+    <div class="tiles">
+        <div class="tile"><span class="tile-icon"><i class="bi bi-journal-bookmark-fill"></i></span><div><b>{{ summary.courses }}</b><span>Courses enrolled</span></div></div>
+        <div class="tile"><span class="tile-icon"><i class="bi bi-patch-check-fill"></i></span><div><b>{{ summary.completed }}</b><span>Courses completed</span></div></div>
+        <div class="tile"><span class="tile-icon"><i class="bi bi-pencil-square"></i></span><div><b>{{ summary.quizzes_taken }}</b><span>Quiz attempts</span></div></div>
+        <div class="tile"><span class="tile-icon"><i class="bi bi-bullseye"></i></span><div><b>{{ summary.avg_score }}%</b><span>Average quiz score</span></div></div>
+    </div>
+
+    <h2 class="dash-section">My courses</h2>
+
+    {% for item in data %}
+    <article class="course-panel">
+        <div class="panel-top">
+            <div class="ring" style="--pct: {{ item.percent|stringformat:'d' }};"><span>{{ item.percent }}%</span></div>
+            <div class="panel-title">
+                <h3>{{ item.course.title }}</h3>
+                <div class="chips">
+                    {% if item.status == 'completed' %}
+                        <span class="chip chip-ok"><i class="bi bi-check-circle-fill"></i> Completed</span>
+                    {% elif item.status == 'in_progress' %}
+                        <span class="chip chip-warn"><i class="bi bi-hourglass-split"></i> In progress</span>
+                    {% else %}
+                        <span class="chip chip-idle"><i class="bi bi-flag"></i> Not started</span>
+                    {% endif %}
+                    <span class="chip"><i class="bi bi-collection"></i> {{ item.total_modules }} modules</span>
+                    <span class="chip"><i class="bi bi-check2-square"></i> {{ item.quizzes_passed }} quiz{{ item.quizzes_passed|pluralize }} cleared</span>
+                </div>
+            </div>
+            <a href="{% url 'course_detail' item.course.slug %}" class="btn btn-outline-brand btn-sm">
+                {% if item.status == 'completed' %}Review course{% else %}Continue{% endif %} <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        <div class="panel-grid">
+            <div>
+                <h6 class="mini-title">Quiz attempts</h6>
+                {% if item.quiz_attempts %}
+                    {% for attempt in item.quiz_attempts %}
+                    <div class="attempt">
+                        <div class="attempt-name">{{ attempt.quiz.title }}</div>
+                        <div class="bar {% if attempt.score_percent >= attempt.quiz.pass_percentage %}ok{% else %}low{% endif %}">
+                            <i style="width: {{ attempt.score_percent|stringformat:'d' }}%"></i>
+                        </div>
+                        <div class="attempt-pct">{{ attempt.score_percent|floatformat:0 }}%</div>
+                    </div>
+                    {% endfor %}
+                    <p class="legend"><span class="dot ok"></span>Passed <span class="dot low ms-3"></span>Below pass mark</p>
+                {% else %}
+                    <p class="muted">No quizzes attempted yet. Finish a module video to unlock its quiz.</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <h6 class="mini-title">Final exam</h6>
+                {% if item.exam_result %}
+                    <div class="exam-card {% if item.exam_result.passed %}is-pass{% else %}is-fail{% endif %}">
+                        <div class="exam-score">{{ item.exam_result.score_percent|floatformat:0 }}<small>%</small></div>
+                        <div>
+                            {% if item.exam_result.passed %}
+                                <div class="exam-verdict"><i class="bi bi-trophy-fill"></i> Passed</div>
+                                <a href="{% url 'download_certificate' item.exam_result.id %}" class="btn btn-brand btn-sm mt-2"><i class="bi bi-award-fill me-1"></i>Certificate</a>
+                            {% else %}
+                                <div class="exam-verdict"><i class="bi bi-x-circle-fill"></i> Not passed</div>
+                                <span class="muted small">You can retake the exam.</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="exam-card is-idle">
+                        <div class="exam-score"><i class="bi bi-lock-fill"></i></div>
+                        <div><div class="exam-verdict">Not attempted</div><span class="muted small">Clear all weekly quizzes to unlock it.</span></div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </article>
+    {% empty %}
+    <div class="empty">
+        <i class="bi bi-journal-x"></i>
+        <h3>No courses yet</h3>
+        <p>You are not enrolled in any courses yet. Pick one and start learning.</p>
+        <a href="{% url 'home' %}#courses" class="btn btn-brand">Browse courses</a>
+    </div>
+    {% endfor %}
+</div>
 {% endblock %}

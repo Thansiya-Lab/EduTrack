@@ -1,171 +1,160 @@
-﻿{% extends 'base.html' %}
-{% block title %}{{ course.title }}{% endblock %}
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ course.title }} - EduTrack{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/course.css' %}">{% endblock %}
 {% block content %}
-<h1>{{ course.title }}</h1>
-<p class="text-muted">Category: {{ course.category.name }} | Instructor: {{ course.instructor_name }}</p>
-<p>{{ course.description }}</p>
-<p>Duration: {{ course.duration_weeks }} weeks</p>
+<div class="course-page">
 
-{% if user.is_authenticated %}
-    {% if is_enrolled %}
-        <span class="badge bg-success mb-3">You are enrolled</span>
+    <!-- HERO -->
+    <section class="course-hero">
+        <a href="{% url 'home' %}#courses" class="back-link"><i class="bi bi-arrow-left"></i> All courses</a>
+        <div class="pills">
+            <span class="pill"><i class="bi bi-tag-fill"></i> {{ course.category.name }}</span>
+            <span class="pill"><i class="bi bi-person-fill"></i> {{ course.instructor_name }}</span>
+            <span class="pill"><i class="bi bi-clock-fill"></i> {{ course.duration_weeks }} weeks</span>
+            {% if is_enrolled %}<span class="pill pill-ok"><i class="bi bi-check-circle-fill"></i> You are enrolled</span>{% endif %}
+        </div>
+        <h1>{{ course.title }}</h1>
+        <p class="hero-desc">{{ course.description }}</p>
+
+        {% if user.is_authenticated %}
+            {% if not is_enrolled %}
+                <form method="post" action="{% url 'enroll' course.slug %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-accent btn-lg"><i class="bi bi-rocket-takeoff-fill me-2"></i>Enroll in this Course</button>
+                </form>
+            {% endif %}
+        {% else %}
+            <a href="{% url 'login' %}" class="btn btn-accent btn-lg"><i class="bi bi-box-arrow-in-right me-2"></i>Login to Enroll</a>
+        {% endif %}
+    </section>
+
+    <h2 class="modules-title">Modules</h2>
+
+    {% if not user.is_authenticated %}
+        <div class="lock-note"><i class="bi bi-lock-fill"></i><div>Please <a href="{% url 'login' %}">login</a> and enroll to access module content, videos, study material and quizzes.</div></div>
+        {% for module in course.modules.all %}
+            <div class="locked-row"><span class="week-no">{{ forloop.counter }}</span><div><small>Week {{ forloop.counter }}</small><strong>{{ module.title }}</strong></div><i class="bi bi-lock-fill ms-auto"></i></div>
+        {% endfor %}
+
+    {% elif not is_enrolled %}
+        <div class="lock-note"><i class="bi bi-lock-fill"></i><div>Enroll in this course to unlock module content, videos, study material and quizzes.</div></div>
+        {% for module in course.modules.all %}
+            <div class="locked-row"><span class="week-no">{{ forloop.counter }}</span><div><small>Week {{ forloop.counter }}</small><strong>{{ module.title }}</strong></div><i class="bi bi-lock-fill ms-auto"></i></div>
+        {% endfor %}
+
     {% else %}
-        <form method="post" action="{% url 'enroll' course.slug %}" class="mb-3">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-success">Enroll in this Course</button>
-        </form>
-    {% endif %}
-{% else %}
-    <a href="{% url 'login' %}" class="btn btn-warning mb-3">Login to Enroll</a>
-{% endif %}
-
-<h4 class="mt-4 mb-3">Modules</h4>
-
-{% if not user.is_authenticated %}
-    <div class="alert alert-secondary">
-        <i class="bi bi-lock-fill"></i> Please <a href="{% url 'login' %}">login</a> and enroll to access module content, videos, study material and quizzes.
-    </div>
-    {% for module in course.modules.all %}
-        <div class="card mb-2 bg-light">
-            <div class="card-body py-2">
-                <span class="text-muted"><i class="bi bi-lock-fill"></i> Week {{ forloop.counter }}: {{ module.title }}</span>
-            </div>
-        </div>
-    {% endfor %}
-
-{% elif not is_enrolled %}
-    <div class="alert alert-secondary">
-        <i class="bi bi-lock-fill"></i> Enroll in this course to unlock module content, videos, study material and quizzes.
-    </div>
-    {% for module in course.modules.all %}
-        <div class="card mb-2 bg-light">
-            <div class="card-body py-2">
-                <span class="text-muted"><i class="bi bi-lock-fill"></i> Week {{ forloop.counter }}: {{ module.title }}</span>
-            </div>
-        </div>
-    {% endfor %}
-
-{% else %}
-<div class="row">
-    <!-- LEFT: Week menu -->
-    <div class="col-md-3 mb-4">
-        <div class="list-group sticky-top" style="top: 1.25rem;">
+    <div class="course-layout">
+        <!-- LEFT: week menu -->
+        <aside class="week-list">
             {% for item in module_data %}
                 <a href="#"
-                   class="list-group-item list-group-item-action week-nav-item {% if forloop.first %}active{% endif %} {% if not item.unlocked %}disabled{% endif %}"
+                   class="week-nav-item week-item {% if forloop.first %}active{% endif %} {% if not item.unlocked %}disabled{% endif %}"
                    data-week="week-{{ item.module.id }}"
                    {% if not item.unlocked %}tabindex="-1" aria-disabled="true"{% endif %}>
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <strong>Week {{ forloop.counter }}</strong><br>
-                            <small>{{ item.module.title }}</small>
-                        </div>
-                        <span>
-                            {% if not item.unlocked %}
-                                <i class="bi bi-lock-fill"></i>
-                            {% elif item.video_watched or not item.module.has_video %}
-                                <i class="bi bi-check-circle-fill text-success"></i>
-                            {% else %}
-                                <i class="bi bi-play-circle"></i>
-                            {% endif %}
-                        </span>
-                    </div>
+                    <span class="week-no">{{ forloop.counter }}</span>
+                    <span class="week-text"><small>Week {{ forloop.counter }}</small><strong>{{ item.module.title }}</strong></span>
+                    <span class="week-state">
+                        {% if not item.unlocked %}
+                            <i class="bi bi-lock-fill"></i>
+                        {% elif item.video_watched or not item.module.has_video %}
+                            <i class="bi bi-check-circle-fill state-done"></i>
+                        {% else %}
+                            <i class="bi bi-play-circle-fill"></i>
+                        {% endif %}
+                    </span>
                 </a>
             {% empty %}
-                <p class="text-muted">No modules added yet.</p>
+                <p class="text-muted p-2">No modules added yet.</p>
             {% endfor %}
 
             {% if course.final_exam %}
                 {% if all_cleared %}
-                    <a href="{% url 'take_exam' course.final_exam.id %}" class="list-group-item list-group-item-action list-group-item-danger">
-                        <i class="bi bi-mortarboard-fill me-1"></i> <strong>Final Exam</strong>
+                    <a href="{% url 'take_exam' course.final_exam.id %}" class="week-item exam-item">
+                        <span class="week-no"><i class="bi bi-mortarboard-fill"></i></span>
+                        <span class="week-text"><small>Ready</small><strong>Final Exam</strong></span>
+                        <span class="week-state"><i class="bi bi-arrow-right-circle-fill"></i></span>
                     </a>
                 {% else %}
-                    <div class="list-group-item text-muted">
-                        <i class="bi bi-lock-fill me-1"></i> <strong>Final Exam</strong>
+                    <div class="week-item exam-locked">
+                        <span class="week-no"><i class="bi bi-mortarboard-fill"></i></span>
+                        <span class="week-text"><small>Locked</small><strong>Final Exam</strong></span>
+                        <span class="week-state"><i class="bi bi-lock-fill"></i></span>
                     </div>
                 {% endif %}
             {% endif %}
-        </div>
-    </div>
+        </aside>
 
-    <!-- RIGHT: Selected week's content -->
-    <div class="col-md-9">
-        {% for item in module_data %}
-            <div class="week-content" id="week-{{ item.module.id }}" style="{% if not forloop.first %}display:none;{% endif %}">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h5 class="mb-0">Week {{ forloop.counter }}: {{ item.module.title }}</h5>
+        <!-- RIGHT: selected week -->
+        <div class="lesson-area">
+            {% for item in module_data %}
+                <div class="week-content" id="week-{{ item.module.id }}" style="{% if not forloop.first %}display:none;{% endif %}">
+                    <div class="lesson-card">
+                        <div class="lesson-head">
+                            <div>
+                                <span class="lesson-eyebrow">Week {{ forloop.counter }}</span>
+                                <h3>{{ item.module.title }}</h3>
+                            </div>
                             {% if item.module.quiz %}
                                 {% if item.quiz_accessible %}
-                                    <a href="{% url 'take_quiz' item.module.quiz.id %}" class="btn btn-sm btn-outline-primary">Take Quiz</a>
+                                    <a href="{% url 'take_quiz' item.module.quiz.id %}" class="btn btn-brand btn-sm"><i class="bi bi-pencil-square me-1"></i>Take Quiz</a>
                                 {% else %}
-                                    <button class="btn btn-sm btn-outline-secondary" disabled>
-                                        <i class="bi bi-lock-fill"></i> Take Quiz
-                                    </button>
+                                    <button class="btn btn-locked btn-sm" disabled><i class="bi bi-lock-fill me-1"></i>Take Quiz</button>
                                 {% endif %}
                             {% endif %}
                         </div>
 
                         {% if item.unlocked %}
                             {% if item.module.content %}
-                                <p class="text-secondary">{{ item.module.content }}</p>
+                                <p class="lesson-text">{{ item.module.content }}</p>
                             {% endif %}
 
                             {% if item.module.video_file %}
-                                <video
-                                    id="video-{{ item.module.id }}"
-                                    class="w-100 mb-2 rounded"
-                                    style="max-height: 420px; background:#000;"
-                                    controls
-                                    data-module-id="{{ item.module.id }}">
-                                    <source src="{{ item.module.video_file.url }}">
-                                    Your browser does not support the video tag.
-                                </video>
-
+                                <div class="video-wrap">
+                                    <video id="video-{{ item.module.id }}" controls data-module-id="{{ item.module.id }}">
+                                        <source src="{{ item.module.video_file.url }}">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
                                 {% if item.video_watched %}
-                                    <p class="small text-success mb-2"><i class="bi bi-check-circle-fill"></i> Video completed - quiz unlocked</p>
+                                    <p class="watch-ok"><i class="bi bi-check-circle-fill"></i> Video completed - quiz unlocked</p>
                                 {% else %}
-                                    <p class="small text-muted mb-2"><i class="bi bi-info-circle"></i> Watch the full video to unlock this module's quiz</p>
+                                    <p class="watch-hint"><i class="bi bi-info-circle"></i> Watch the full video to unlock this module's quiz</p>
                                 {% endif %}
 
                             {% elif item.youtube_embed_url %}
-                                <div class="ratio ratio-16x9 mb-2" style="max-width: 640px;">
-                                    <iframe
-                                        src="{{ item.youtube_embed_url }}"
-                                        allow="autoplay; encrypted-media"
-                                        allowfullscreen>
-                                    </iframe>
+                                <div class="video-wrap ratio ratio-16x9">
+                                    <iframe src="{{ item.youtube_embed_url }}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
                                 </div>
-
                                 {% if item.video_watched %}
-                                    <p class="small text-success mb-2"><i class="bi bi-check-circle-fill"></i> Video marked as watched - quiz unlocked</p>
+                                    <p class="watch-ok"><i class="bi bi-check-circle-fill"></i> Video marked as watched - quiz unlocked</p>
                                 {% else %}
-                                    <div class="alert alert-light border py-2 px-3 mb-2">
-                                        <p class="small text-muted mb-2"><i class="bi bi-info-circle"></i> Some YouTube videos cannot report "video finished" automatically when embedded. Watch the full video above, then confirm below to unlock the quiz.</p>
-                                        <button type="button" class="btn btn-sm btn-success js-mark-watched" data-module-id="{{ item.module.id }}">
-                                            <i class="bi bi-check-circle"></i> I've watched the full video
+                                    <div class="confirm-box">
+                                        <p><i class="bi bi-info-circle"></i> Some YouTube videos cannot report "video finished" automatically when embedded. Watch the full video above, then confirm below to unlock the quiz.</p>
+                                        <button type="button" class="btn btn-success btn-sm js-mark-watched" data-module-id="{{ item.module.id }}">
+                                            <i class="bi bi-check-circle me-1"></i> I've watched the full video
                                         </button>
                                     </div>
                                 {% endif %}
                             {% endif %}
 
                             {% if item.module.material_pdf %}
-                                <a href="{{ item.module.material_pdf.url }}" target="_blank" class="btn btn-sm btn-outline-dark">
-                                    <i class="bi bi-file-earmark-pdf-fill"></i> View Study Material (PDF)
+                                <a href="{{ item.module.material_pdf.url }}" target="_blank" class="pdf-link">
+                                    <span class="pdf-icon"><i class="bi bi-file-earmark-pdf-fill"></i></span>
+                                    <span><strong>Study Material</strong><small>Open the PDF notes for this week</small></span>
+                                    <i class="bi bi-box-arrow-up-right ms-auto"></i>
                                 </a>
                             {% endif %}
                         {% else %}
-                            <p class="text-muted mb-0"><i class="bi bi-info-circle"></i> Pass the previous week's quiz to unlock this module.</p>
+                            <div class="lock-note mb-0"><i class="bi bi-info-circle"></i><div>Pass the previous week's quiz to unlock this module.</div></div>
                         {% endif %}
                     </div>
                 </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
     </div>
+    {% endif %}
 </div>
-{% endif %}
 
 {% if is_enrolled %}
 <script>

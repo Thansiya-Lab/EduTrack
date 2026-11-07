@@ -1,0 +1,73 @@
+.dash { max-width: 1100px; margin: 0 auto; padding: 2rem 1rem 0; }
+
+.dash-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.6rem; }
+.dash-eyebrow { color: var(--p-700); font-weight: 700; font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; }
+.dash-head h1 { font-size: clamp(2rem, 4vw, 2.9rem); margin: .2rem 0; color: var(--p-900); }
+.dash-head p { margin: 0; color: var(--ink-2); }
+
+/* summary tiles */
+.tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+.tile { background: #fff; border-radius: 20px; box-shadow: var(--shadow); padding: 1.1rem 1.2rem; display: flex; align-items: center; gap: .9rem; }
+.tile-icon { width: 48px; height: 48px; border-radius: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #fff; background: linear-gradient(135deg, var(--p-600), var(--p-800)); }
+.tile b { display: block; font-family: 'DM Serif Display', serif; font-weight: 400; font-size: 1.9rem; line-height: 1; color: var(--ink); }
+.tile span:not(.tile-icon) { font-size: .82rem; color: var(--ink-2); }
+
+.dash-section { font-size: 1.6rem; margin: 0 0 1rem; }
+
+/* course panel */
+.course-panel { background: #fff; border-radius: 24px; box-shadow: var(--shadow); padding: 1.6rem; margin-bottom: 1.4rem; }
+.panel-top { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; padding-bottom: 1.3rem; border-bottom: 1px solid var(--p-100); }
+.panel-title { flex: 1; min-width: 220px; }
+.panel-title h3 { font-size: 1.5rem; margin: 0 0 .5rem; }
+
+.ring {
+    --pct: 0; width: 84px; height: 84px; border-radius: 50%; position: relative; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: conic-gradient(var(--p-700) calc(var(--pct) * 1%), var(--p-100) 0);
+}
+.ring::before { content: ""; position: absolute; inset: 9px; background: #fff; border-radius: 50%; }
+.ring span { position: relative; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 1.15rem; color: var(--p-800); }
+
+.chips { display: flex; gap: .5rem; flex-wrap: wrap; }
+.chip { display: inline-flex; align-items: center; gap: .35rem; background: var(--p-50); color: var(--p-800); border: 1px solid var(--p-100); border-radius: 999px; padding: .25rem .75rem; font-size: .8rem; font-weight: 600; }
+.chip-ok { background: #E2F5EC; color: #0B5A3A; border-color: #BFE8D4; }
+.chip-warn { background: #FEF3D6; color: #6B4500; border-color: #F3D48A; }
+.chip-idle { background: #F1EEF4; color: #6D6580; border-color: #E2DDE8; }
+
+.panel-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 2rem; padding-top: 1.3rem; }
+.mini-title { text-transform: uppercase; letter-spacing: .1em; font-size: .75rem; color: #7A7090; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; margin-bottom: .8rem; }
+
+.attempt { display: flex; align-items: center; gap: .9rem; margin-bottom: .65rem; }
+.attempt-name { flex: 0 0 34%; font-size: .92rem; font-weight: 500; }
+.bar { flex: 1; height: 10px; background: var(--p-100); border-radius: 999px; overflow: hidden; }
+.bar > i { display: block; height: 100%; border-radius: 999px; }
+.bar.ok > i { background: linear-gradient(90deg, #35B987, #168A5B); }
+.bar.low > i { background: linear-gradient(90deg, #F2A65A, #D9534F); }
+.attempt-pct { width: 3rem; text-align: right; font-weight: 800; font-size: .88rem; }
+.legend { font-size: .76rem; color: #7A7090; margin: .8rem 0 0; }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: .35rem; }
+.dot.ok { background: #168A5B; } .dot.low { background: #D9534F; }
+.muted { color: #7A7090; }
+
+.exam-card { display: flex; align-items: center; gap: 1.1rem; border-radius: 18px; padding: 1.1rem 1.2rem; border: 1px solid var(--p-100); background: var(--p-50); }
+.exam-card.is-pass { background: #E9F7F0; border-color: #BFE8D4; }
+.exam-card.is-fail { background: #FBE9EB; border-color: #F0C2C8; }
+.exam-score { font-family: 'DM Serif Display', serif; font-size: 2.6rem; line-height: 1; color: var(--ink); }
+.exam-score small { font-size: 1.1rem; }
+.exam-card.is-idle .exam-score { font-size: 2rem; color: var(--p-500); }
+.exam-verdict { font-weight: 800; font-family: 'Plus Jakarta Sans', sans-serif; }
+.is-pass .exam-verdict { color: #0B5A3A; } .is-fail .exam-verdict { color: #8E2535; }
+
+.empty { background: #fff; border-radius: 24px; box-shadow: var(--shadow); text-align: center; padding: 3rem 1.5rem; }
+.empty i { font-size: 2.6rem; color: var(--p-500); }
+.empty h3 { margin: .6rem 0 .3rem; }
+.empty p { color: var(--ink-2); }
+
+@media (max-width: 991.98px) {
+    .tiles { grid-template-columns: repeat(2, 1fr); }
+    .panel-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+}
+@media (max-width: 575.98px) {
+    .attempt { flex-wrap: wrap; } .attempt-name { flex-basis: 100%; }
+    .tile { padding: .9rem; }
+}

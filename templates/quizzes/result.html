@@ -1,16 +1,26 @@
-﻿{% extends 'base.html' %}
-{% block title %}Quiz Result{% endblock %}
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Quiz Result - EduTrack{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/quiz.css' %}">{% endblock %}
 {% block content %}
-<h2>Quiz Result - {{ quiz.title }}</h2>
-<p>You scored {{ correct }} out of {{ total }} ({{ score|floatformat:1 }}%)</p>
-{% if score >= quiz.pass_percentage %}
-    <div class="alert alert-success">Congratulations! You passed.</div>
-{% else %}
-    <div class="alert alert-danger">You did not pass. Try again!</div>
-{% endif %}
-
-<a href="{% url 'course_detail' quiz.module.course.slug %}" class="btn btn-primary">
-    <i class="bi bi-arrow-left-circle"></i> Back to Course
-    {% if score >= quiz.pass_percentage %}(Next Module Unlocked){% endif %}
-</a>
+<div class="qz-page narrow">
+    <div class="rs-card">
+        <p class="rs-label">Quiz result &middot; {{ quiz.title }}</p>
+        <div class="rs-ring {% if score >= quiz.pass_percentage %}is-pass{% else %}is-fail{% endif %}" style="--pct: {{ score|stringformat:'d' }};">
+            <span>{{ score|floatformat:0 }}%</span>
+        </div>
+        <p class="rs-score">You scored <b>{{ correct }}</b> out of <b>{{ total }}</b> ({{ score|floatformat:1 }}%)</p>
+        {% if score >= quiz.pass_percentage %}
+            <div class="rs-verdict pass"><i class="bi bi-check-circle-fill"></i> Congratulations! You passed.</div>
+        {% else %}
+            <div class="rs-verdict fail"><i class="bi bi-x-circle-fill"></i> You did not pass. Try again!</div>
+        {% endif %}
+        <p class="rs-mark">Pass mark: {{ quiz.pass_percentage }}%</p>
+        <div class="rs-actions">
+            <a href="{% url 'course_detail' quiz.module.course.slug %}" class="btn btn-brand">
+                <i class="bi bi-arrow-left-circle me-2"></i>Back to Course{% if score >= quiz.pass_percentage %} (Next Module Unlocked){% endif %}
+            </a>
+        </div>
+    </div>
+</div>
 {% endblock %}

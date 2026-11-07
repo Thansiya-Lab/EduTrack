@@ -1,14 +1,27 @@
-﻿{% extends 'base.html' %}
-{% block title %}Exam Result{% endblock %}
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Exam Result - EduTrack{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/quiz.css' %}">{% endblock %}
 {% block content %}
-<h2>Final Exam Result - {{ exam.course.title }}</h2>
-<p>You scored {{ correct }} out of {{ total }} ({{ score|floatformat:1 }}%)</p>
-{% if passed %}
-    <div class="alert alert-success">Congratulations! You passed the final exam.</div>
-    <a href="{% url 'download_certificate' result.id %}" class="btn btn-warning">
-        <i class="bi bi-award-fill"></i> Download Certificate
-    </a>
-{% else %}
-    <div class="alert alert-danger">You did not pass. You may retake the exam.</div>
-{% endif %}
+<div class="qz-page narrow">
+    <div class="rs-card">
+        <p class="rs-label">Final exam result &middot; {{ exam.course.title }}</p>
+        <div class="rs-ring {% if passed %}is-pass{% else %}is-fail{% endif %}" style="--pct: {{ score|stringformat:'d' }};">
+            <span>{{ score|floatformat:0 }}%</span>
+        </div>
+        <p class="rs-score">You scored <b>{{ correct }}</b> out of <b>{{ total }}</b> ({{ score|floatformat:1 }}%)</p>
+        {% if passed %}
+            <div class="rs-verdict pass"><i class="bi bi-check-circle-fill"></i> Congratulations! You passed the final exam.</div>
+            <div class="rs-actions">
+                <a href="{% url 'download_certificate' result.id %}" class="btn btn-brand btn-lg"><i class="bi bi-award-fill me-2"></i>Download Certificate</a>
+            </div>
+        {% else %}
+            <div class="rs-verdict fail"><i class="bi bi-x-circle-fill"></i> You did not pass. You may retake the exam.</div>
+            <div class="rs-actions">
+                <a href="{% url 'take_exam' exam.id %}" class="btn btn-brand"><i class="bi bi-arrow-repeat me-2"></i>Retake Exam</a>
+                <a href="{% url 'course_detail' exam.course.slug %}" class="btn btn-outline-brand">Back to Course</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}
